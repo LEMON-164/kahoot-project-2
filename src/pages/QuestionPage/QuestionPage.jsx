@@ -35,23 +35,26 @@ const QuestionPage = () => {
                 <div className="timer-circle">
                     <span>{timeLeft}</span>
                 </div>
+
+                {/* Hình ảnh ở giữa */}
+                <div className="question-image">
+                    <h1 style={{ color: '#00bfa6' }}>Kahoot!</h1>
+                </div>
+
+                <div className="answer-count">
+                    <Title level={4}>{answersCount}</Title>
+                    <span>Answers</span>
+                </div>
+
+
                 <div className="question-header-bar">
                     <Title level={2} className="question-text">
                         What does "香蕉" mean?
                     </Title>
                 </div>
 
-
-                <div className="answer-count">
-                    <Title level={4}>{answersCount}</Title>
-                    <span>Answers</span>
-                </div>
             </div>
 
-            {/* Optional Image */}
-            {/* <div className="question-image">
-                <h1 style={{ color: '#00bfa6' }}>Kahoot!</h1>
-            </div> */}
 
             {/* Answer Choices */}
             <Row gutter={[16, 16]} className="answer-options">
@@ -61,7 +64,6 @@ const QuestionPage = () => {
                             className="answer-button"
                             style={{ backgroundColor: ans.color }}
                             block
-                            icon={ans.icon}
                             size="large"
                         >
                             {ans.text}

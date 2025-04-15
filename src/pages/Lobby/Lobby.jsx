@@ -39,7 +39,6 @@ const Lobby = () => {
 
     return (
         <div className="lobby-container">
-
             <div className="pin-header">
                 <span className="pin-text">
                     Join at <b>www.kahoot.it</b> with Game PIN: <b>{gamePin}</b>
@@ -48,40 +47,14 @@ const Lobby = () => {
 
             <div className="title-bar">
                 <h1 className="logo">QUIZZZZ!</h1>
-                <Button
-                    className="button-s"
-                    onClick={handleStart}
-                    disabled={players.length === 0 || isStarted}
-                >
-                    Bắt đầu
-                </Button>
-
-            </div>
-
-            <div className="lobby-input">
-                <Input
-                    placeholder="Nhập tên của bạn"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    style={{ marginBottom: '1rem', width: 400, height: 50 }}
-                />
-
-            </div>
-            <div className="lobby-input">
-                <Input
-                    placeholder="Nhập nhóm của bạn"
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    style={{ marginBottom: '1rem', width: 400, height: 50 }}
-                />
             </div>
             <div className='button'>
                 <Button type="primary" block style={{ backgroundColor: 'white', color: 'black', padding: '30px 30px', fontWeight: 'bold' }} onClick={handleJoin}>
-                    Tham gia
+                   Bắt đầu
                 </Button>
             </div>
             <div className="player-list">
-                <Title level={3} style={{ color: 'white' }}>Người chơi ({players.length}):</Title>
+                <Title level={3} style={{ color: 'white' }}>Người chơi ({players.length})</Title>
                 {players.length > 0 ? (
                     <List
                         grid={{ gutter: 16, column: 4 }}

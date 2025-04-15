@@ -6,6 +6,21 @@
   position: relative;
 }
 
+.EnterRoom-container {
+  height: 100vh;
+  width: 100vw;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  color: white;
+  background: linear-gradient(to bottom right, #4b0dbf, #350089);
+  overflow-x: hidden;
+  position: relative;
+}
+
 
 .switch-theme {
   position: absolute;
@@ -31,9 +46,11 @@
 }
 
 .logo {
-  color: #f8f8f8;
   font-size: 36px;
-  margin-bottom: 2px;
+  color: white;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .pin-input {

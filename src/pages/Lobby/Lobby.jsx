@@ -1,7 +1,7 @@
 // src/Layout/Lobby.jsx
 import React, { useState } from 'react';
 import { Input, Button, Typography, List, Card, message } from 'antd';
-import '../Styles/Lobby.css';
+import '../Lobby/Lobby.css';
 
 const { Title } = Typography;
 
@@ -39,18 +39,19 @@ const Lobby = () => {
 
     return (
         <div className="lobby-container">
-            <div className="pin-header">
-                <span className="pin-text">
-                    Join at <b>www.kahoot.it</b> with Game PIN: <b>{gamePin}</b>
-                </span>
+            <div className="header-container">
+                <div className="pin-header">
+                    <span className="pin-text">
+                        Join at <b>www.kahoot.it</b> with Game PIN: <b>{gamePin}</b>
+                    </span>
+                </div>
             </div>
-
             <div className="title-bar">
                 <h1 className="logo">QUIZZZZ!</h1>
             </div>
             <div className='button'>
                 <Button type="primary" block style={{ backgroundColor: 'white', color: 'black', padding: '30px 30px', fontWeight: 'bold' }} onClick={handleJoin}>
-                   Bắt đầu
+                    Bắt đầu
                 </Button>
             </div>
             <div className="player-list">

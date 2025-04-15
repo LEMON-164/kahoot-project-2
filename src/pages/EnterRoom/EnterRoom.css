@@ -1,60 +1,76 @@
 .kahoot-layout {
   height: 100vh;
-  background: linear-gradient(to bottom right, #4b0dbf, #350089);
+  width: 100vw;
+  background: linear-gradient(135deg, #4b0dbf 0%, #350089 100%);
   color: white;
-  font-family: 'Arial Rounded MT Bold', sans-serif;
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   position: relative;
+  overflow: hidden;
 }
 
-.EnterRoom-container {
-  height: 100vh;
-  width: 100vw;
-  padding: 2rem 1rem;
+.centered-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  box-sizing: border-box;
-  color: white;
-  background: linear-gradient(to bottom right, #4b0dbf, #350089);
-  overflow-x: hidden;
-  position: relative;
-}
-
-
-.switch-theme {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.content-wrapper {
-  display: flex;
   justify-content: center;
-  align-items: center;
   height: 100%;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .kahoot-box {
   background-color: white;
-  padding: 24px;
-  border-radius: 12px;
+  padding: 30px;
+  border-radius: 16px;
   text-align: center;
-  width: 320px;
-  height: 200px;
-}
-
-.logo {
-  font-size: 36px;
-  color: white;
-  font-weight: bold;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .pin-input {
-  margin-top: 30px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  height: 48px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
 }
 
+.pin-input:hover,
+.pin-input:focus {
+  border-color: #5a0fcd;
+}
+
+.enter-button {
+  height: 48px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(to right, #5a0fcd, #7b2be8);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.enter-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(90, 15, 205, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .logo {
+    font-size: 36px;
+    margin-bottom: 50px;
+  }
+
+  .kahoot-box {
+    padding: 24px;
+    border-radius: 12px;
+  }
+
+  .pin-input,
+  .enter-button {
+    height: 44px;
+  }
+}

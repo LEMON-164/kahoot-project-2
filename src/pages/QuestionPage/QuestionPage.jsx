@@ -49,9 +49,9 @@ const QuestionPage = () => {
             </div>
 
             {/* Optional Image */}
-            <div className="question-image">
+            {/* <div className="question-image">
                 <h1 style={{ color: '#00bfa6' }}>Kahoot!</h1>
-            </div>
+            </div> */}
 
             {/* Answer Choices */}
             <Row gutter={[16, 16]} className="answer-options">

@@ -6,7 +6,7 @@ import {
     CaretDownOutlined,
     CaretLeftOutlined,
 } from '@ant-design/icons';
-import '../Styles/QuestionPage.css';
+import './QuestionPage.css';
 
 const { Title } = Typography;
 

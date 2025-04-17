@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Checkbox, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom'; 
 import './Login.css';
 
 const { Title, Text } = Typography;
@@ -83,9 +84,11 @@ const LoginPage = () => {
         </Button>
 
         <div className="login-footer">
-          <Text>Bạn chưa có tài khoản? </Text>
+          <Text>
+            Bạn chưa có tài khoản? 
+          </Text>
           <Button type="link" className="register-link">
-            Đăng ký ngay
+             <Link to="/register/username">Đăng ký ngay</Link>
           </Button>
         </div>
       </div>

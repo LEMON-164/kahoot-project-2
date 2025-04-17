@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Tooltip, message } from 'antd';
 import { InfoCircleOutlined, StarOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom'; 
 import './RegisterUser.css';
 
 const { Title, Text } = Typography;
@@ -28,7 +29,7 @@ const RegisterPage = () => {
 
   return (
     <div className="register-container">
-      <Title level={2} className="register-title">Tạo tên đăng nhập</Title>
+      <Title level={2} className="register-title" style={{ color: 'white' }}>Tạo tên đăng nhập</Title>
 
       <div className="register-box">
         <div className="register-label">
@@ -68,7 +69,8 @@ const RegisterPage = () => {
           style={{ marginTop: 24 }}
           onClick={handleRegister}
         >
-          Tiếp tục
+          {/* Tiếp tục */}
+          <Link to="/register/signup-options">Tiếp tục</Link>
         </Button>
       </div>
     </div>

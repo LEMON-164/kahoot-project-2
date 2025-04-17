@@ -22,7 +22,7 @@ const EmailRegisterPage = () => {
 
   return (
     <div className="email-register-container">
-      <Title level={2} className="title">Tạo tài khoản</Title>
+      <Title level={2} className="title" style={{ color: 'white' }}>Tạo tài khoản</Title>
 
       <div className="register-box">
         <Title level={4}>Đăng ký bằng địa chỉ email</Title>

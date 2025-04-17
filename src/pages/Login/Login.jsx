@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Checkbox, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import './Login.css';
 
 const { Title, Text } = Typography;

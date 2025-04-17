@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Input, Button, Checkbox, Typography, Divider, message } from 'antd';
 import { GoogleOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import './RegisterMail.css';
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 const EmailRegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -72,7 +73,8 @@ const EmailRegisterPage = () => {
         <div className="login-footer">
           <Text>Bạn đã có tài khoản? </Text>
           <Button type="link" className="login-link">
-            Đăng Nhập ngay
+            <Link to="/">Đăng Nhập ngay</Link>
+            {/* Đăng Nhập ngay */}
           </Button>
         </div>
       </div>

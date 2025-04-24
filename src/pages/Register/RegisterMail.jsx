@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Input, Button, Checkbox, Typography, Divider, message } from 'antd';
 import { GoogleOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { createUser } from '../../services/UserServices';
 import './RegisterMail.css';
 
 const { Title, Text } = Typography;
@@ -11,14 +12,38 @@ const EmailRegisterPage = () => {
   const [password, setPassword] = useState('');
   const [isHuman, setIsHuman] = useState(false);
 
-  const handleRegister = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const nickname = location.state?.nickname; // 👈 nhận nickname từ bước trước
+
+  const handleRegister = async () => {
     if (!email || !password) {
       message.error('Vui lòng nhập đầy đủ email và mật khẩu!');
       return;
     }
 
-    message.success('Đăng ký thành công!');
-    // Gửi dữ liệu đăng ký ở đây
+    if (!nickname) {
+      message.error('Không có tên đăng nhập, vui lòng quay lại bước trước!');
+      navigate('/register/username');
+      return;
+    }
+
+    try {
+      const result = await createUser({
+        username: nickname,
+        email,
+        password,
+      });
+
+      message.success('Đăng ký thành công!');
+      localStorage.setItem('user', JSON.stringify(result));
+      localStorage.setItem('isLoggedIn', 'true');
+
+      navigate('/home');
+    } catch (error) {
+      console.error('Lỗi đăng ký:', error);
+      message.error('Đăng ký thất bại, vui lòng thử lại!');
+    }
   };
 
   return (
@@ -61,7 +86,7 @@ const EmailRegisterPage = () => {
         <div className="terms">
           Bằng việc đăng ký, bạn chấp nhận{' '}
           <Link href="#" target="_blank">Điều khoản và điều kiện</Link> của chúng tôi.
-          Vui lòng đọc <Link href="#" target="_blank">Thông báo quyền riêng tư</Link> của chúng tôi.
+          Vui lòng đọc <Link href="#" target="_blank">Thông báo quyền riêng tư</Link>.
         </div>
 
         <Divider plain>hoặc</Divider>
@@ -74,7 +99,6 @@ const EmailRegisterPage = () => {
           <Text>Bạn đã có tài khoản? </Text>
           <Button type="link" className="login-link">
             <Link to="/">Đăng Nhập ngay</Link>
-            {/* Đăng Nhập ngay */}
           </Button>
         </div>
       </div>

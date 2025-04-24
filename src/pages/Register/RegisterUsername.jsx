@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Tooltip, message } from 'antd';
 import { InfoCircleOutlined, StarOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
 import './RegisterUser.css';
 
 const { Title, Text } = Typography;
-
 const MAX_LENGTH = 20;
 
 const RegisterPage = () => {
   const [nickname, setNickname] = useState('');
+  const navigate = useNavigate();
 
   const handleRegister = () => {
     if (!nickname.trim()) {
@@ -17,12 +17,11 @@ const RegisterPage = () => {
       return;
     }
 
-    message.success(`Tên "${nickname}" đã được tạo!`);
-    // Xử lý đăng ký ở đây
+    navigate('/register/signup-options', { state: { nickname } });
   };
 
   const generateRandomName = () => {
-    const randomNames = ['Im_fool_123', 'Im_gay_456', 'Im_not_human_789', 'Im_pedophilia_101112', 'gaylord_131415'];
+    const randomNames = ['FunnyFox123', 'BakaDude456', 'CyberKangaroo'];
     const random = randomNames[Math.floor(Math.random() * randomNames.length)];
     setNickname(random);
   };
@@ -69,8 +68,7 @@ const RegisterPage = () => {
           style={{ marginTop: 24 }}
           onClick={handleRegister}
         >
-          {/* Tiếp tục */}
-          <Link to="/register/signup-options">Tiếp tục</Link>
+          Tiếp tục
         </Button>
       </div>
     </div>

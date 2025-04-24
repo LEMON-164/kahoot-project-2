@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Checkbox, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; 
+import { loginUser } from '../../services/UserServices'; // đảm bảo đúng đường dẫn
 import './Login.css';
 
 const { Title, Text } = Typography;
@@ -10,25 +11,38 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (!username || !password) {
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
       message.error('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!');
       return;
     }
-    message.success('Đăng nhập thành công!');
-    // Xử lý đăng nhập ở đây
+
+    try {
+      const result = await loginUser({ username, password });
+
+      console.log(' Đăng nhập thành công, response:', result);
+      message.success('Đăng nhập thành công!');
+
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('user', JSON.stringify(result));
+
+      navigate('/UserMenu');
+    } catch (err) {
+      console.error(' Đăng nhập thất bại:', err);
+      message.error('Tên đăng nhập hoặc mật khẩu không đúng!');
+    }
   };
 
   const handleGoogleLogin = () => {
     message.info('Chức năng đăng nhập bằng Google đang được phát triển.');
-    // Xử lý đăng nhập Google tại đây
   };
 
   return (
     <div className="login-container">
       <div className="login-header">
-        <Title className="login-title">Login</Title>
+        <Title className="login-title">Đăng nhập</Title>
       </div>
 
       <div className="login-form">
@@ -62,10 +76,10 @@ const LoginPage = () => {
           </Button>
         </div>
 
-        <Button 
-          type="primary" 
-          size="large" 
-          block 
+        <Button
+          type="primary"
+          size="large"
+          block
           onClick={handleLogin}
           className="login-button"
         >
@@ -84,11 +98,9 @@ const LoginPage = () => {
         </Button>
 
         <div className="login-footer">
-          <Text>
-            Bạn chưa có tài khoản? 
-          </Text>
+          <Text>Bạn chưa có tài khoản?</Text>
           <Button type="link" className="register-link">
-             <Link to="/register/username">Đăng ký ngay</Link>
+            <Link to="/register/username">Đăng ký ngay</Link>
           </Button>
         </div>
       </div>

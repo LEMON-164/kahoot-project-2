@@ -5,6 +5,7 @@ import RegisterPage from "../pages/Register/RegisterUsername";
 import EmailRegisterPage from "../pages/Register/RegisterMail"; 
 import Lobby from '../pages/Lobby/Lobby';
 import QuizCreationPage from "../pages/CreateQuiz/CreateQuiz";
+import UserDashBoard from "../pages/UserDashboard/UserDashBoard";
 const AppRouter = () => {
     return (
         <Router>
@@ -15,6 +16,7 @@ const AppRouter = () => {
                 <Route path="/register/signup-options" element={<EmailRegisterPage />} />
                 <Route path="/lobby" element={<Lobby />} />
                 <Route path="/creator" element={<QuizCreationPage />} />
+                <Route path="/UserMenu" element={<UserDashBoard />} />
             </Routes>
         </Router>
     );

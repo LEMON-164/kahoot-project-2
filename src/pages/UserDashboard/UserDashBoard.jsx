@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-    Layout, Menu, Input, Table, Tag, Space, Button, Avatar, Row, Col
+    Layout, Menu, Input, Table, Tag, Space, Button, Avatar, Row, Col, Dropdown
 } from 'antd';
 import {
     UserOutlined,
@@ -10,10 +10,11 @@ import {
     BellOutlined,
     EditOutlined,
     CheckOutlined,
-    CloseOutlined
+    CloseOutlined,
+    LogoutOutlined  
 } from '@ant-design/icons';
-
 import './UserDashBoard.css';
+import { useNavigate } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
 
@@ -102,6 +103,16 @@ const UserDashBoard = () => {
         }
     ];
 
+    const handleLogout = () => {
+        
+        localStorage.removeItem('user'); // Remove user data from local storage
+        localStorage.removeItem('isLoggedIn'); // Remove login status from local storage
+        console.log("Logging out");
+        navigate('/'); // Redirect to login page
+    };
+
+    const navigate = useNavigate();
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width={200}>
@@ -123,7 +134,29 @@ const UserDashBoard = () => {
                     />
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <BellOutlined style={{ fontSize: 18 }} />
-                        <Avatar src="https://randomuser.me/api/portraits/men/32.jpg" />
+                        <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: '1',
+                                        label: 'Profile',
+                                        icon: <UserOutlined />,
+                                        // onClick: () => navigate('/profile') // Navigate to the profile page
+                                    },
+                                    {
+                                        key: '2',
+                                        label: 'Logout',
+                                        icon: <LogoutOutlined />,
+                                        onClick: handleLogout
+                                    }
+                                ]
+                            }}
+                            placement="bottomRight"
+                        >
+                            <Button type="text" style={{ padding: 0 }}>
+                                <Avatar src="https://randomuser.me/api/portraits/men/32.jpg" />
+                            </Button>
+                        </Dropdown>
                     </div>
                 </Header>
                 <Content style={{ margin: '16px' }}>
@@ -132,7 +165,14 @@ const UserDashBoard = () => {
                             <h2 style={{ margin: 0 }}>Your Quizzzes</h2>
                         </Col>
                         <Col>
-                            <Button type="primary">Create</Button>
+                            <Button type="primary"
+                                icon={<EditOutlined />}
+                                onClick={() => {
+                                    navigate('/creator'); // Navigate to the create quiz page
+                                }}
+                            >
+                                Create
+                            </Button>
                         </Col>
                     </Row>
                     <Table columns={columns} dataSource={data} pagination={false} />

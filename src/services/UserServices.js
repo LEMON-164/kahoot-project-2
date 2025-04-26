@@ -31,4 +31,3 @@ export const createUser = async (userData) => {
       throw error;
     }
   };
-  

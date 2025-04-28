@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Layout,
   Input,
@@ -10,6 +10,7 @@ import {
   Col,
   Card,
   Checkbox,
+  InputNumber,
 } from 'antd';
 import {
   PlusOutlined,
@@ -17,9 +18,17 @@ import {
   DeleteOutlined,
   CopyOutlined,
   CloseOutlined,
+  ArrowLeftOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
 import './CreateQuiz.css';
-
+import {
+  getQuizQuestions,
+  updateQuizQuestion,
+  createQuizQuestion,
+  deleteQuizQuestion,
+} from '../../services/QuizServices';
+import { useLocation, useNavigate } from 'react-router-dom';
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
@@ -32,10 +41,14 @@ const answerStyles = [
 ];
 
 const CreateQuiz = () => {
-  const [questions, setQuestions] = useState([{ id: 0, type: 'Trắc nghiệm' }]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const quizId = location.pathname.split('/').pop();
+  const [questions, setQuestions] = useState([]);
   const [selectedQuestion, setSelectedQuestion] = useState(0);
   const [answers, setAnswers] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState(null);
+  const [timeLimit, setTimeLimit] = useState(20);
 
   const handleAnswerChange = (index, value) => {
     const newAnswers = [...answers];
@@ -43,21 +56,95 @@ const CreateQuiz = () => {
     setAnswers(newAnswers);
   };
 
-  const handleAddQuestion = () => {
-    const newQuestion = { id: Date.now(), type: 'Trắc nghiệm' };
-    setQuestions([...questions, newQuestion]);
-    setSelectedQuestion(questions.length);
-    setAnswers(['', '', '', '']);
-    setCorrectAnswer(null);
-  };
-
-  const handleRemoveQuestion = (index) => {
-    const updatedQuestions = questions.filter((_, i) => i !== index);
-    setQuestions(updatedQuestions);
-    if (selectedQuestion >= updatedQuestions.length) {
-      setSelectedQuestion(updatedQuestions.length - 1);
+  const handleAddQuestion = async () => {
+    try {
+      const response = await createQuizQuestion(quizId, {
+        quizId: quizId,
+        text: 'New Question',
+        timeLimit: 20,
+        imageUrl: '',
+        option1: '',
+        option2: '',
+        option3: '',
+        option4: '',
+        correctOption: 0,
+        orderIndex: questions.length,
+        createdTime: new Date().toISOString(),
+        status: 'active',
+      });
+      setQuestions([...questions, response.data]);
+      setSelectedQuestion(questions.length);
+      setAnswers(['', '', '', '']);
+      setCorrectAnswer(null);
+    } catch (error) {
+      console.error('Error creating quiz question:', error);
     }
   };
+
+  const handleRemoveQuestion = async (index) => {
+    // const updatedQuestions = questions.filter((_, i) => i !== index);
+    // setQuestions(updatedQuestions);
+    // if (selectedQuestion >= updatedQuestions.length) {
+    //   setSelectedQuestion(updatedQuestions.length - 1);
+    // }
+    try {
+      await deleteQuizQuestion(questions[index].questionId);
+      setQuestions(questions.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error('Error deleting quiz question:', error);
+    }
+  };
+
+  const handleSaveQuestion = async () => {
+    const question = getQuestion();
+    const updatedData = {
+      questionId: question.questionId,
+      quizId: quizId,
+      text: question.text,
+      timeLimit: timeLimit,
+      imageUrl: question.imageUrl,
+      option1: answers[0],
+      option2: answers[1],
+      option3: answers[2],
+      option4: answers[3],
+      orderIndex: question.orderIndex,
+      correctOption: correctAnswer,
+      status: question.status,
+    };
+    try {
+      const response = await updateQuizQuestion(
+        question.questionId,
+        updatedData
+      );
+      console.log(response);
+    } catch (error) {
+      console.error('Error updating quiz question:', error);
+    }
+  };
+
+  const getQuestion = () => {
+    const question = questions.find((q) => q.questionId === selectedQuestion);
+    console.log(question);
+    return question;
+  };
+
+  useEffect(() => {
+    const fetchQuizQuestion = async () => {
+      console.log(quizId);
+      const response = await getQuizQuestions(quizId);
+      setQuestions(response.data);
+      setSelectedQuestion(response.data[0].questionId);
+      setAnswers([
+        response.data[0].option1,
+        response.data[0].option2,
+        response.data[0].option3,
+        response.data[0].option4,
+      ]);
+      setCorrectAnswer(response.data[0].correctOption);
+      setTimeLimit(response.data[0].timeLimit);
+    };
+    fetchQuizQuestion();
+  }, [quizId]);
 
   return (
     <Layout className="createquiz-container">
@@ -66,11 +153,16 @@ const CreateQuiz = () => {
         <div className="quiz-sider-scroll">
           {questions.map((q, index) => (
             <div
-              key={q.id}
+              key={q.questionId}
               className={`question-thumb ${
-                selectedQuestion === index ? 'selected' : ''
+                selectedQuestion === q.questionId ? 'selected' : ''
               }`}
-              onClick={() => setSelectedQuestion(index)}
+              onClick={() => {
+                setSelectedQuestion(q.questionId);
+                setAnswers([q.option1, q.option2, q.option3, q.option4]);
+                setCorrectAnswer(q.correctOption);
+                setTimeLimit(q.timeLimit);
+              }}
             >
               <div className="question-thumb-header">
                 <span className="question-number">Câu {index + 1}</span>
@@ -82,7 +174,7 @@ const CreateQuiz = () => {
                   }}
                 />
               </div>
-              <p>{q.type}</p>
+              {/* <p>{q.text}</p> */}
               <div className="question-preview" />
             </div>
           ))}
@@ -94,7 +186,6 @@ const CreateQuiz = () => {
         >
           Thêm câu hỏi
         </Button>
-        <Button className="add-slide-btn">Thêm slide</Button>
       </Sider>
 
       {/* Main Content */}
@@ -102,12 +193,28 @@ const CreateQuiz = () => {
         <Title level={4} className="quiz-title">
           Bắt đầu nhập câu hỏi
         </Title>
-
+        {getQuestion() && (
+          <Input
+            className="question-input-text"
+            placeholder="Nhập câu hỏi"
+            value={getQuestion().text || ''}
+            onChange={(e) => {
+              setQuestions(
+                questions.map((q) =>
+                  q.questionId === selectedQuestion
+                    ? { ...q, text: e.target.value }
+                    : q
+                )
+              );
+            }}
+          />
+        )}
+        {/* 
         <div className="media-upload-box">
           <Upload>
             <Button icon={<UploadOutlined />}>Tải tệp tin lên</Button>
           </Upload>
-        </div>
+        </div> */}
 
         <Row gutter={[16, 16]}>
           {[0, 1, 2, 3].map((i) => {
@@ -122,14 +229,35 @@ const CreateQuiz = () => {
                   className={`${styleClass} ${
                     correctAnswer === i ? 'selected' : ''
                   }`}
-                  onClick={() => isFilled && setCorrectAnswer(i)}
+                  onClick={() => {
+                    if (isFilled) {
+                      setQuestions(
+                        questions.map((q) => {
+                          if (q.questionId === selectedQuestion) {
+                            return { ...q, correctOption: i };
+                          }
+                          return q;
+                        })
+                      );
+                      setCorrectAnswer(i);
+                    }
+                  }}
                 >
                   <div className="answer-header-b">
                     <span className="answer-icon">{answerStyles[i].icon}</span>
                     {isFilled && (
                       <Checkbox
                         checked={correctAnswer === i}
-                        onChange={() => setCorrectAnswer(i)}
+                        onChange={() => {
+                          setQuestions(
+                            questions.map((q) => {
+                              if (q.questionId === selectedQuestion) {
+                                return { ...q, correctOption: i };
+                              }
+                              return q;
+                            })
+                          );
+                        }}
                         className="answer-checkbox"
                       />
                     )}
@@ -152,42 +280,24 @@ const CreateQuiz = () => {
       {/* Settings Panel */}
       <Sider width={280} className="quiz-settings" theme="light">
         <div className="setting-group">
-          <p className="setting-label">Loại câu hỏi</p>
-          <Select defaultValue="Trắc nghiệm" style={{ width: '100%' }}>
-            <Option value="Trắc nghiệm">Trắc nghiệm</Option>
-          </Select>
-        </div>
-
-        <div className="setting-group">
           <p className="setting-label">Giới hạn thời gian</p>
-          <Select defaultValue="20 giây" style={{ width: '100%' }}>
-            <Option value="5 giây">5 giây</Option>
-            <Option value="10 giây">10 giây</Option>
-            <Option value="20 giây">20 giây</Option>
-            <Option value="30 giây">30 giây</Option>
-          </Select>
-        </div>
-
-        <div className="setting-group">
-          <p className="setting-label">Điểm</p>
-          <Select defaultValue="Tiêu chuẩn" style={{ width: '100%' }}>
-            <Option value="Tiêu chuẩn">Tiêu chuẩn</Option>
-            <Option value="Không tính điểm">Không tính điểm</Option>
-          </Select>
-        </div>
-
-        <div className="setting-group">
-          <p className="setting-label">Đáp án để chọn</p>
-          <Select defaultValue="Chọn một đáp án" style={{ width: '100%' }}>
-            <Option value="Chọn một đáp án">Chọn một đáp án</Option>
-            <Option value="Chọn nhiều đáp án">Chọn nhiều đáp án</Option>
-          </Select>
+          <InputNumber
+            min={5}
+            max={60}
+            value={timeLimit}
+            onChange={(value) => setTimeLimit(value)}
+          />
         </div>
 
         <div className="setting-actions">
-          <Button icon={<CopyOutlined />}>Sao chép</Button>
-          <Button danger icon={<DeleteOutlined />}>
-            Xoá
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/UserMenu')}
+          >
+            Quay lại
+          </Button>
+          <Button icon={<SaveOutlined />} onClick={handleSaveQuestion}>
+            Lưu
           </Button>
         </div>
       </Sider>

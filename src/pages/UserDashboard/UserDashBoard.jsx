@@ -11,7 +11,7 @@ import {
     EditOutlined,
     CheckOutlined,
     CloseOutlined,
-    LogoutOutlined  
+    LogoutOutlined
 } from '@ant-design/icons';
 import './UserDashBoard.css';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +54,20 @@ const UserDashBoard = () => {
 
     const handleChange = (e, field) => {
         setEditedUser({ ...editedUser, [field]: e.target.value });
+    };
+
+    const createQuiz = () => {
+        const newKey = 1; // tạo key duy nhất
+        const newQuiz = {
+            key: newKey,
+            quizId:newKey, // hoặc bạn để rỗng ''
+            title: '',
+            description: '',
+            status: 'Draft', // hoặc "Pending", "Active" tùy bạn
+        };
+        setData(prevData => [...prevData, newQuiz]);
+        setEditingKey(newKey);
+        setEditedUser(newQuiz);
     };
 
     const columns = [
@@ -104,7 +118,7 @@ const UserDashBoard = () => {
     ];
 
     const handleLogout = () => {
-        
+
         localStorage.removeItem('user'); // Remove user data from local storage
         localStorage.removeItem('isLoggedIn'); // Remove login status from local storage
         console.log("Logging out");
@@ -167,9 +181,7 @@ const UserDashBoard = () => {
                         <Col>
                             <Button type="primary"
                                 icon={<EditOutlined />}
-                                onClick={() => {
-                                    navigate('/creator'); // Navigate to the create quiz page
-                                }}
+                                onClick={() => createQuiz()}
                             >
                                 Create
                             </Button>

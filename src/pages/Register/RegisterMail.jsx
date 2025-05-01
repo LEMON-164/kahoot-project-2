@@ -36,10 +36,10 @@ const EmailRegisterPage = () => {
       });
 
       message.success('Đăng ký thành công!');
-      localStorage.setItem('user', JSON.stringify(result));
+      localStorage.setItem('user', JSON.stringify(result.data));
       localStorage.setItem('isLoggedIn', 'true');
 
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       console.error('Lỗi đăng ký:', error);
       message.error('Đăng ký thất bại, vui lòng thử lại!');

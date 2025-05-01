@@ -2,7 +2,7 @@ import apiClient from './apiClient';
 // 1. Tạo người dùng mới
 export const createUser = async (userData) => {
   try {
-    const response = await apiClient.post('/api/users/CreateUser', userData);
+    const response = await apiClient.post('/api/users', userData);
     return response.data;
   } catch (error) {
     console.error('Error creating user:', error);
@@ -14,7 +14,7 @@ export const createUser = async (userData) => {
 export const updateUser = async (userId, updatedData) => {
   try {
     const response = await apiClient.put(
-      `/api/users/UpdateUser/${userId}`,
+      `/api/users/${userId}`,
       updatedData
     );
     return response.data;

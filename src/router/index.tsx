@@ -6,6 +6,11 @@ import EmailRegisterPage from '../pages/Register/RegisterMail';
 import Lobby from '../pages/Lobby/Lobby';
 import QuizCreationPage from '../pages/CreateQuiz/CreateQuiz';
 import UserDashBoard from '../pages/UserDashboard/UserDashBoard';
+import TeamLobbyHostPage from '../pages/TeamLobbyHost/TeamlobbyHost';
+import Host from '../pages/Host/Host';
+import HostQuestionPage from '../pages/HostQuestion/HostQuestionPage';
+import Leaderboard from '../pages/Leaderboard/Leaderboard';
+
 const AppRouter = () => {
   return (
     <Router>
@@ -20,6 +25,10 @@ const AppRouter = () => {
         <Route path="/lobby" element={<Lobby />} />
         <Route path="/creator/*" element={<QuizCreationPage />} />
         <Route path="/UserMenu" element={<UserDashBoard />} />
+        <Route path="/teamlobbyhost/:gamePin" element={<TeamLobbyHostPage/>} />
+        <Route path="/HostQuestionPage/:sessionId/:QuestionInGameID" element={<HostQuestionPage />} />
+        <Route path="/host/:gamePin" element={<Host />} />
+        <Route path="/leaderboard/:sessionId" element={<Leaderboard />} />
       </Routes>
     </Router>
   );

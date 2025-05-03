@@ -1,4 +1,3 @@
-// GameSessionModal.jsx
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, InputNumber, Radio } from 'antd';
 import axios from 'axios';
@@ -52,8 +51,12 @@ const GameSessionModal = ({ visible, onClose, quizId }) => {
       );
 
       onClose();
-      // navigate to host page
-      navigate(`/host/${generatedPin}`);
+      // chuyển hướng dựa trên chế độ chơi
+      if (values.gameMode === 'solo') {
+        navigate(`/host/${generatedPin}`);
+      } else {
+        navigate(`/teamlobbyhost/${generatedPin}`);
+      }
     } catch (err) {
       console.error(err);
     } finally {

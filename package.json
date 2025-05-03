@@ -34,5 +34,5 @@
     "globals": "^15.15.0",
     "vite": "^6.2.0"
   },
-  "proxy": "http://localhost:7153"
+  "proxy": "https://localhost:7153/"
 }

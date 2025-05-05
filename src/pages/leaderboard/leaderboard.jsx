@@ -111,10 +111,10 @@ const Leaderboard = () => {
         return;
       }
   
-      // Find the next question with a larger orderIndex
+      // Find the next question with a larger OrderIndex
       const nextQuestion = questions
-        .filter(q => q.orderIndex > currentQuestion.orderIndex)
-        .sort((a, b) => a.orderIndex - b.orderIndex)[0];
+        .filter(q => q.OrderIndex > currentQuestion.OrderIndex)
+        .sort((a, b) => a.OrderIndex - b.OrderIndex)[0];
   
       console.log('Next question:', nextQuestion);
 

@@ -23,6 +23,7 @@ import {
   CloseOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import { Header } from '../../homepage/Layouts/header';
 import './UserDashBoard.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -30,9 +31,10 @@ import {
   updateQuiz,
   createQuiz,
   deleteQuiz,
+  getAllSessions,
 } from '../../services/QuizServices';
 // import { getQuizByUserId } from '../../services/UserServices';
-const { Header, Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
 const UserDashBoard = () => {
   const currentUser =
@@ -41,8 +43,10 @@ const UserDashBoard = () => {
     JSON.parse(localStorage.getItem('user')).data.user;
 
   const [data, setData] = useState([]);
+  const [sessionData, setSessionData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
   const [editedUser, setEditedUser] = useState({});
+  const [selectedMenuKey, setSelectedMenuKey] = useState('1');
 
   const edit = (record) => {
     setEditingKey(record.quizId);
@@ -99,6 +103,17 @@ const UserDashBoard = () => {
       console.error('Error deleting quiz:', error);
     }
   };
+
+  const fetchAllSessions = async () => {
+    try {
+      const response = await getAllSessions(currentUser.userId);
+      console.log('Session data:', response.data);
+      setSessionData(response.data);
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+    }
+  };
+
   const columns = [
     {
       title: 'Quizzz ID',
@@ -182,13 +197,6 @@ const UserDashBoard = () => {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('user'); // Remove user data from local storage
-    localStorage.removeItem('isLoggedIn'); // Remove login status from local storage
-    console.log('Logging out');
-    navigate('/'); // Redirect to login page
-  };
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -201,6 +209,8 @@ const UserDashBoard = () => {
         console.error('Error fetching quizzes:', error);
       }
     };
+
+    fetchAllSessions();
     fetchQuizzes();
     console.log(JSON.parse(localStorage.getItem('user')).data.user);
   }, []);
@@ -218,7 +228,22 @@ const UserDashBoard = () => {
         >
           QUIZZZZZZ
         </div>
-        <Menu mode="inline" defaultSelectedKeys={['1']}>
+        {/* <Menu mode="inline" defaultSelectedKeys={['1']}>
+          <Menu.Item key="1" icon={<UserOutlined />}>
+            Cá nhân
+          </Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreOutlined />}>
+            Thư viện
+          </Menu.Item>
+          <Menu.Item key="3" icon={<LineChartOutlined />}>
+            Báo cáo
+          </Menu.Item>
+        </Menu> */}
+        <Menu
+          mode="inline"
+          selectedKeys={[selectedMenuKey]}
+          onClick={(e) => setSelectedMenuKey(e.key)}
+        >
           <Menu.Item key="1" icon={<UserOutlined />}>
             Cá nhân
           </Menu.Item>
@@ -229,42 +254,11 @@ const UserDashBoard = () => {
             Báo cáo
           </Menu.Item>
         </Menu>
+
       </Sider>
       <Layout>
-        <Header className="custom-header">
-          <Input
-            placeholder="Search"
-            prefix={<SearchOutlined />}
-            style={{ width: 300 }}
-          />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <BellOutlined style={{ fontSize: 18 }} />
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: '1',
-                    label: 'Profile',
-                    icon: <UserOutlined />,
-                    // onClick: () => navigate('/profile') // Navigate to the profile page
-                  },
-                  {
-                    key: '2',
-                    label: 'Logout',
-                    icon: <LogoutOutlined />,
-                    onClick: handleLogout,
-                  },
-                ],
-              }}
-              placement="bottomRight"
-            >
-              <Button type="text" style={{ padding: 0 }}>
-                <Avatar src="https://randomuser.me/api/portraits/men/32.jpg" />
-              </Button>
-            </Dropdown>
-          </div>
-        </Header>
-        <Content style={{ margin: '16px' }}>
+        <Header />
+        {/* <Content style={{ margin: '16px' }}>
           <Row
             justify="space-between"
             align="middle"
@@ -286,7 +280,60 @@ const UserDashBoard = () => {
             )}
           </Row>
           <Table columns={columns} dataSource={data} pagination={false} />
+        </Content> */}
+        <Content style={{ margin: '16px' }}>
+          {selectedMenuKey === '1' && (
+            <>
+              <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+                <Col>
+                  <h2 style={{ margin: 0 }}>Your Quizzzes</h2>
+                </Col>
+                {currentUser.role === 'Admin' && (
+                  <Col>
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
+                      onClick={handleCreateQuiz}
+                    >
+                      Create
+                    </Button>
+                  </Col>
+                )}
+              </Row>
+              <Table columns={columns} dataSource={data} pagination={false} />
+            </>
+          )}
+
+          {selectedMenuKey === '3' && (
+            <>
+              <h2>📊 Danh sách Quiz</h2>
+              <Table
+                dataSource={sessionData}
+                rowKey="sessionId"
+                columns={[
+                  { title: 'Session ID', dataIndex: 'sessionId' },
+                  { title: 'Date', dataIndex: 'startedAt' },
+                  {
+                    title: 'Xem báo cáo',
+                    render: (_, record) => (
+                      <Button onClick={() => navigate(`/summary/${record.sessionId}`)}>
+                        Xem báo cáo
+                      </Button>
+                    ),
+                  },
+                ]}
+              />
+            </>
+          )}
+
+          {selectedMenuKey === '2' && (
+            <>
+              <h2>📚 Thư viện</h2>
+              <p>Đây là nơi để quản lý các quiz của bạn. (Chức năng chưa được triển khai)</p>
+            </>
+          )}
         </Content>
+
       </Layout>
     </Layout>
   );

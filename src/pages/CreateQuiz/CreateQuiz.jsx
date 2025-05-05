@@ -59,18 +59,19 @@ const CreateQuiz = () => {
   const handleAddQuestion = async () => {
     try {
       const response = await createQuizQuestion(quizId, {
-        quizId: quizId,
-        text: 'New Question',
-        timeLimit: 20,
-        imageUrl: '',
-        option1: '',
-        option2: '',
-        option3: '',
-        option4: '',
-        correctOption: 0,
-        orderIndex: questions.length,
-        createdTime: new Date().toISOString(),
-        status: 'active',
+        QuizId: quizId,
+        Text: 'New Question',
+        TimeLimit: 20,
+        ImageFile: null,
+        ImageData: null,
+        Option1: '',
+        Option2: '',
+        Option3: '',
+        Option4: '',
+        CorrectOption: 1,
+        OrderIndex: questions.length,
+        CreatedTime: new Date().toISOString(),
+        Status: 'active',
       });
       setQuestions([...questions, response.data]);
       setSelectedQuestion(questions.length);
@@ -97,19 +98,21 @@ const CreateQuiz = () => {
 
   const handleSaveQuestion = async () => {
     const question = getQuestion();
+    console.log(quizId);
     const updatedData = {
-      questionId: question.questionId,
-      quizId: quizId,
-      text: question.text,
-      timeLimit: timeLimit,
-      imageUrl: question.imageUrl,
-      option1: answers[0],
-      option2: answers[1],
-      option3: answers[2],
-      option4: answers[3],
-      orderIndex: question.orderIndex,
-      correctOption: correctAnswer,
-      status: question.status,
+      QuestionId: question.QuestionId,
+      QuizId: quizId,
+      Text: question.text,
+      TimeLimit: timeLimit,
+      ImageFile: null,
+      ImageData: null,
+      Option1: answers[0],
+      Option2: answers[1],
+      Option3: answers[2],
+      Option4: answers[3],
+      OrderIndex: question.orderIndex,
+      CorrectOption: correctAnswer,
+      Status: question.status,
     };
     try {
       const response = await updateQuizQuestion(

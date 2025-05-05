@@ -10,6 +10,7 @@ import TeamLobbyHostPage from '../pages/TeamLobbyHost/TeamlobbyHost';
 import Host from '../pages/Host/Host';
 import HostQuestionPage from '../pages/HostQuestion/HostQuestionPage';
 import Leaderboard from '../pages/Leaderboard/Leaderboard';
+import Summary from '../pages/Sumary/Summary';
 
 const AppRouter = () => {
   return (
@@ -29,6 +30,8 @@ const AppRouter = () => {
         <Route path="/HostQuestionPage/:sessionId/:QuestionInGameID" element={<HostQuestionPage />} />
         <Route path="/host/:gamePin" element={<Host />} />
         <Route path="/leaderboard/:sessionId" element={<Leaderboard />} />
+        <Route path="/summary/:sessionId" element={<Summary />} />
+        {/* Add more routes as needed */}
       </Routes>
     </Router>
   );

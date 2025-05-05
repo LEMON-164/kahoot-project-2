@@ -14,7 +14,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': 'http://localhost:7153',  // Đảm bảo trỏ đúng cổng của backend
+      '/api': 'http://localhost:5173',  // Đảm bảo trỏ đúng cổng của backend
     }
   }
 });

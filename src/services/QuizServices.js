@@ -24,7 +24,7 @@ export const createQuiz = async (quizData) => {
 
 export const updateQuiz = async (quizId, updatedData) => {
   try {
-    const response = await apiClient.put(`/api/quizzes/${quizId}`, updatedData);
+    const response = await apiClient.putForm(`/api/quizzes/${quizId}`, updatedData);
     return response.data;
   } catch (error) {
     console.error(`Error updating quiz with ID ${quizId}:`, error);
@@ -64,7 +64,7 @@ export const getQuizQuestions = async (quizId) => {
 
 export const updateQuizQuestion = async (questionId, updatedData) => {
   try {
-    const response = await apiClient.put(
+    const response = await apiClient.putForm(
       `/api/questions/${questionId}`,
       updatedData
     );
@@ -77,7 +77,7 @@ export const updateQuizQuestion = async (questionId, updatedData) => {
 
 export const createQuizQuestion = async (quizId, questionData) => {
   try {
-    const response = await apiClient.post(`/api/questions`, questionData);
+    const response = await apiClient.postForm(`/api/questions`, questionData);
     return response.data;
   } catch (error) {
     console.error(`Error creating quiz question with ID ${quizId}:`, error);
@@ -94,3 +94,21 @@ export const deleteQuizQuestion = async (questionId) => {
     throw error;
   }
 };
+
+export const getSessionSummary = async (sessionId) => {
+  try {
+    const response = await apiClient.get(`/api/gamesession/${sessionId}/summary`);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to load session summary:", err);
+  }
+};
+
+export const getAllSessions = async () => {
+  try {
+    const response = await apiClient.get(`/api/gamesession/GetAll`);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to load session summary:", err);
+  }
+}

@@ -91,7 +91,7 @@ const Host = () => {
       message.success('Game is starting!');
       const res = await axios.get(`https://localhost:7153/api/game-sessions/${sessionId}/questions-in-game`);
       if (res.data?.statusCode === 200) {
-        const first = res.data.data.find(q => q.orderIndex === 1);
+        const first = res.data.data.find(q => q.OrderIndex === 1);
         if (first) navigate(`/HostQuestionPage/${sessionId}/${first.questionInGameId}`);
         else message.error('No first question found!');
       }

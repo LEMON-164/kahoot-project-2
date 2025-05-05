@@ -25,7 +25,7 @@ const HostQuestionPage = () => {
           `https://localhost:7153/api/questions-in-game/${QuestionInGameID}`
         );
         const questionId = inGameRes.data?.data?.questionId;
-        localStorage.setItem('OrderIndex', inGameRes.data?.data?.orderIndex);
+        localStorage.setItem('OrderIndex', inGameRes.data?.data?.OrderIndex);
         if (!questionId) {
           message.error('Cannot find question ID');
           return;
@@ -153,10 +153,10 @@ const HostQuestionPage = () => {
   }
 
   const options = [
-    questionData.option1,
-    questionData.option2,
-    questionData.option3,
-    questionData.option4,
+    questionData.Option1,
+    questionData.Option2,
+    questionData.Option3,
+    questionData.Option4,
   ];
 
   return (

@@ -14,6 +14,7 @@ const HostQuestionPage = () => {
   const [questionData, setQuestionData] = useState(null);
   const [timeLeft, setTimeLeft] = useState(30);
   const [answersCount, setAnswersCount] = useState(0);
+  const [playerCount, setPlayerCount] = useState(0);
   const connectionRef = useRef(null);
 
   localStorage.setItem('QuestionInGame', QuestionInGameID);
@@ -50,18 +51,18 @@ const HostQuestionPage = () => {
 
   useEffect(() => {
     const fetchResponseCount = async () => {
-        try {
-            const response = await axios.get(
-                `https://localhost:7153/api/questions/questions-in-game/${QuestionInGameID}/responses`
-            );
-            if (response.data && response.data.data) {
-                const count = response.data.data.length; // Count responses
-                setAnswersCount(count); // Update answer count
-            }
-        } catch (error) {
-            console.error('Error fetching responses:', error);
-            message.error('Failed to fetch responses');
+      try {
+        const response = await axios.get(
+          `https://localhost:7153/api/questions/questions-in-game/${QuestionInGameID}/responses`
+        );
+        if (response.data && response.data.data) {
+          const count = response.data.data.length; // Count responses
+          setAnswersCount(count); // Update answer count
         }
+      } catch (error) {
+        console.error('Error fetching responses:', error);
+        message.error('Failed to fetch responses');
+      }
     };
 
     // Fetch response count immediately after loading
@@ -73,6 +74,25 @@ const HostQuestionPage = () => {
     // Clear interval when component unmounts
     return () => clearInterval(intervalId);
   }, [QuestionInGameID]);
+
+  useEffect(() => {
+    const fetchPlayersCount = async () => {
+        try {
+            const response = await axios.get(
+                `https://localhost:7153/api/sessions/${sessionId}/players`
+            );
+            const players = response.data?.data || [];
+            setPlayerCount(players.length);
+        } catch (error) {
+            console.error('Error fetching players:', error);
+            message.error('Failed to fetch players count');
+        }
+    };
+
+    if (sessionId) {
+        fetchPlayersCount();
+    }
+}, [sessionId]);
 
   // SignalR connection for response count
   useEffect(() => {
@@ -161,41 +181,43 @@ const HostQuestionPage = () => {
 
   return (
     <div className="question-container">
-     
+
 
       <div className="question-header">
-        <div className="timer-circle">
-          <span>{timeLeft}</span>
-        </div>
+
 
         <div className="question-image">
           {questionData.imageUrl && (
             <img
               src={questionData.imageUrl}
               alt="question"
-              style={{ maxWidth: '100%', maxHeight: '200px' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           )}
         </div>
 
-        <div className="answer-count">
-          <Title level={4}>{answersCount}</Title>
-          <span>Answers</span>
-        </div>
-
         <div className="question-header-bar">
-          <Title level={2} className="question-text">
+          <div className="timer-circle">
+            <span>{timeLeft}</span>
+          </div>
+          <Title level={1} className="question-text">
             {questionData.text}
           </Title>
+          <div className="answer-count">
+            <Title level={4}>{answersCount}/{playerCount}</Title>
+            <span>Answers</span>
+          </div>
         </div>
       </div>
 
-      <Row gutter={[16, 16]} className="answer-options">
+      <Row gutter={[50, 16]} className="answer-options">
         {options.map((text, idx) => (
           <Col xs={24} sm={12} key={idx}>
             <Button
-              className="answer-button-host"
-              style={{ backgroundColor: COLORS[idx] }}
+              className="answer-button"
+              style={{
+                backgroundColor: COLORS[idx],
+              }}
               block
               size="large"
               disabled

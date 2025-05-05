@@ -20,22 +20,43 @@ const Leaderboard = () => {
   const navigate = useNavigate();
   const [players, setPlayers] = useState([]);
   const [hubConnection, setHubConnection] = useState(null);
-  const [isModalVisible, setModalVisible] = useState(false); // Modal visibility state
-  const [modalContent, setModalContent] = useState(''); // Modal content
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState('');
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await axios.get(
-          `https://localhost:7153/api/gamesession/GetLeaderboard/${sessionId}`
+        // First, get session info to determine game mode
+        const sessionRes = await axios.get(
+          `https://localhost:7153/api/gamesession/GetById/${sessionId}`
         );
-        setPlayers(res.data.data);
+        const mode = sessionRes.data.data.gameMode?.toLowerCase(); // adjust property name if different
+
+        if (mode === 'team') {
+          // Team mode: fetch team rankings
+          const teamRes = await axios.get(
+            `https://localhost:7153/api/team-results/ranking/session/${sessionId}`
+          );
+          const teamData = teamRes.data.data || [];
+          // Map team results into common shape
+          const mapped = teamData.map(item => ({
+            ranking: item.rank,
+            nickname: item.teamName,
+            score: item.totalScore,
+          }));
+          setPlayers(mapped);
+        } else {
+          // Solo mode (default): fetch individual leaderboard
+          const soloRes = await axios.get(
+            `https://localhost:7153/api/gamesession/GetLeaderboard/${sessionId}`
+          );
+          setPlayers(soloRes.data.data || []);
+        }
       } catch (err) {
         console.error('[fetchLeaderboard] Error:', err);
         message.error('Không thể tải bảng điểm');
       }
     };
-
     const conn = new HubConnectionBuilder()
       .withUrl(`https://localhost:7153/gameSessionHub`, {
         transport: HttpTransportType.WebSockets,
@@ -48,7 +69,6 @@ const Leaderboard = () => {
     conn.start()
       .then(() => {
         console.log('[SignalR] Connected');
-        // Đăng ký sự kiện lắng nghe từ server
         conn.on('ReceiveNextQuestion', (data) => {
           console.log('[ReceiveNextQuestion] Data:', data);
           navigate(`/QuestionPage/${data.sessionId}/${data.qigId}`);
@@ -96,15 +116,13 @@ const Leaderboard = () => {
       const res = await axios.get(`https://localhost:7153/api/game-sessions/${sessionId}/questions-in-game`);
       console.log('[handleNextClick] API response:', res.data);
   
-      // Extract the questions array from the response data
       const questions = Array.isArray(res.data.data) ? res.data.data : [];
-  
+
       if (questions.length === 0) {
         message.error('Không có câu hỏi nào trong game');
         return;
       }
-  
-      // Find the current question in the list
+
       const currentQuestion = questions.find(q => q.questionInGameId === qigId);
       if (!currentQuestion) {
         message.error('Không tìm thấy câu hỏi hiện tại');
@@ -119,12 +137,10 @@ const Leaderboard = () => {
       console.log('Next question:', nextQuestion);
 
       if (nextQuestion) {
-        // Navigate to the next question page
         navigate(`/HostQuestionPage/${sessionId}/${nextQuestion.questionInGameId}`);
       } else {
-        // If no next question, show modal to confirm end game
         setModalContent('Đã hết câu hỏi. Bạn có muốn kết thúc trò chơi không?');
-        setModalVisible(true); // Show custom modal
+        setModalVisible(true);
       }
     } catch (err) {
       console.error('[handleNextClick] Error:', err);
@@ -134,21 +150,14 @@ const Leaderboard = () => {
 
   const handleModalConfirm = async () => {
     console.log('Game Ended');
-  
-    // Check if hubConnection is established
     if (!hubConnection || hubConnection.state !== HubConnectionState.Connected) {
       message.error('Chưa kết nối server');
       return;
     }
-  
+
     try {
-      // Log the sessionId to confirm it's correct
       console.log('SessionId:', sessionId);
-  
-      // Make the call to the server to end the game
       await hubConnection.invoke('EndGameSession', parseInt(sessionId, 10));
-  
-      // Close the modal after the confirmation
       setModalVisible(false);
       message.success('Game ended successfully');
     } catch (err) {
@@ -159,7 +168,7 @@ const Leaderboard = () => {
 
   const handleModalClose = () => {
     console.log('Game continues');
-    setModalVisible(false); // Close the modal
+    setModalVisible(false);
   };
 
   return (
@@ -175,19 +184,28 @@ const Leaderboard = () => {
       <List
         itemLayout="horizontal"
         dataSource={players}
-        renderItem={(item) => (
-          <List.Item className="leader-item">
-            <Row align="middle" style={{ width: '100%' }}>
-              <Col flex="auto" className="leader-info">
-                <Col flex="2px" className="leader-rank">
-                  {medalIcons[item.rank] || <Text strong>{item.ranking}</Text>}
+        style={{ width: '100%' }}
+        renderItem={(item) => {
+          const icon = medalIcons[item.ranking];
+          return (
+            <List.Item className="leader-item">
+              <Row align="middle" style={{ width: '100%' }}>
+                <Col flex="auto" className="leader-info">
+                  <Col
+                    flex="2px"
+                    className="leader-rank"
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    {icon && <span style={{ marginRight: 4 }}>{icon}</span>}
+                    <Text strong>{item.ranking}</Text>
+                  </Col>
+                  <div className="leader-name">{item.nickname}</div>
+                  <div className="leader-score">{item.score}</div>
                 </Col>
-                <div className="leader-name">{item.nickname}</div>
-                <div className="leader-score">{item.score}</div>
-              </Col>
-            </Row>
-          </List.Item>
-        )}
+              </Row>
+            </List.Item>
+          );
+        }}
       />
       <CustomModal
         isVisible={isModalVisible}

@@ -33,8 +33,10 @@ import {
   deleteQuiz,
   getAllSessions,
 } from '../../services/QuizServices';
+import GameSessionModal from './HostModal'; 
 // import { getQuizByUserId } from '../../services/UserServices';
 const { Sider, Content } = Layout;
+
 
 const UserDashBoard = () => {
   const currentUser =
@@ -47,6 +49,19 @@ const UserDashBoard = () => {
   const [editingKey, setEditingKey] = useState('');
   const [editedUser, setEditedUser] = useState({});
   const [selectedMenuKey, setSelectedMenuKey] = useState('1');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState(null);
+
+
+  const handleHost = (quizId) => {
+    setSelectedQuizId(quizId);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
 
   const edit = (record) => {
     setEditingKey(record.quizId);
@@ -192,7 +207,7 @@ const UserDashBoard = () => {
             Delete
           </Button>
         ) : (
-          <Button>Host</Button>
+              <Button onClick={() => handleHost(record.quizId)}>Host</Button>
         ),
     },
   ];
@@ -335,6 +350,11 @@ const UserDashBoard = () => {
         </Content>
 
       </Layout>
+      <GameSessionModal
+        visible={isModalVisible}
+        quizId={selectedQuizId}
+        onClose={closeModal}
+      />
     </Layout>
   );
 };

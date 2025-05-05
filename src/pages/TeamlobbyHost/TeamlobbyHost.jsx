@@ -16,11 +16,13 @@ const TeamLobbyHostPage = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [teams, setTeams] = useState([]);
 
+  const host = import.meta.env.VITE_API_BE_URL || 'http://localhost:5173/'; // Default port if not set in .env
+
   // Fetch sessionId by gamePin
   useEffect(() => {
     if (!gamePin) return;
     axios
-      .get(`https://localhost:7153/api/gamesession/GetGameSessionWithPin/${gamePin}`)
+      .get(`${host}/api/gamesession/GetGameSessionWithPin/${gamePin}`)
       .then(res => {
         if (res.data?.statusCode === 200) {
           setSessionId(res.data.data.sessionId);
@@ -36,7 +38,7 @@ const TeamLobbyHostPage = () => {
     if (!sessionId) return;
     try {
       const res = await axios.get(
-        `https://localhost:7153/api/team/GetTeamsBySessionId/${sessionId}`
+        `${host}/api/team/GetTeamsBySessionId/${sessionId}`
       );
       const data = Array.isArray(res.data)
         ? res.data
@@ -48,7 +50,7 @@ const TeamLobbyHostPage = () => {
         data.map(async team => {
           try {
             const pr = await axios.get(
-              `https://localhost:7153/api/team/GetPlayersByTeamId/${team.teamId}`
+              `${host}/api/team/GetPlayersByTeamId/${team.teamId}`
             );
             const list = Array.isArray(pr.data)
               ? pr.data
@@ -81,7 +83,7 @@ const TeamLobbyHostPage = () => {
     const connect = async () => {
       const conn = new HubConnectionBuilder()
         .withUrl(
-          'https://localhost:7153/gameSessionHub',
+          '${host}/gameSessionHub',
           { skipNegotiation: true, transport: HttpTransportType.WebSockets }
         )
         .withAutomaticReconnect()
@@ -112,7 +114,7 @@ const TeamLobbyHostPage = () => {
 
     try {
       const { data: newTeam } = await axios.post(
-        'https://localhost:7153/api/team/CreateTeam',
+        '${host}/api/team/CreateTeam',
         { sessionId, name }
       );
       setTeams(prev => [...prev, { ...newTeam, players: [] }]);
@@ -140,7 +142,7 @@ const TeamLobbyHostPage = () => {
       message.success('Game is starting!');
 
       const res = await axios.get(
-        `https://localhost:7153/api/game-sessions/${sessionId}/questions-in-game`
+        `${host}/api/game-sessions/${sessionId}/questions-in-game`
       );
       if (res.data?.statusCode === 200) {
         const first = res.data.data.find(q => q.orderIndex === 1);

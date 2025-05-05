@@ -20,10 +20,11 @@ const Host = () => {
   const prevPlayersRef = useRef([]);
   const navigate = useNavigate();
 
+  const host = import.meta.env.VITE_API_BE_URL || 'http://localhost:5173/'; // Default port if not set in .env
   // Fetch sessionId by gamePin
   useEffect(() => {
     if (!gamePin) return;
-    axios.get(`https://localhost:7153/api/gamesession/GetGameSessionWithPin/${gamePin}`)
+    axios.get(`${host}/api/gamesession/GetGameSessionWithPin/${gamePin}`)
       .then(res => {
         if (res.data?.statusCode === 200) {
           setSessionId(res.data.data.sessionId);
@@ -38,7 +39,7 @@ const Host = () => {
   useEffect(() => {
     const connect = async () => {
       const conn = new HubConnectionBuilder()
-        .withUrl('https://localhost:7153/gameSessionHub', { skipNegotiation: true, transport: HttpTransportType.WebSockets })
+        .withUrl(`${host}/gameSessionHub`, { skipNegotiation: true, transport: HttpTransportType.WebSockets })
         .withAutomaticReconnect()
         .build();
 
@@ -59,7 +60,7 @@ const Host = () => {
     if (!sessionId) return;
     const fetchPlayers = async () => {
       try {
-        const res = await axios.get(`https://localhost:7153/api/sessions/${sessionId}/players`);
+        const res = await axios.get(`${host}/api/sessions/${sessionId}/players`);
         if (res.data?.statusCode === 200) {
           const list = res.data.data;
           const newbies = list.filter(p => !prevPlayersRef.current.some(x => x.playerId === p.playerId));
@@ -89,7 +90,7 @@ const Host = () => {
       await connectionRef.current.invoke('StartGameSession', parseInt(sessionId, 10));
       setIsStarted(true);
       message.success('Game is starting!');
-      const res = await axios.get(`https://localhost:7153/api/game-sessions/${sessionId}/questions-in-game`);
+      const res = await axios.get(`${host}/api/game-sessions/${sessionId}/questions-in-game`);
       if (res.data?.statusCode === 200) {
         const first = res.data.data.find(q => q.OrderIndex === 1);
         if (first) navigate(`/HostQuestionPage/${sessionId}/${first.questionInGameId}`);

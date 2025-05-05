@@ -17,13 +17,15 @@ const HostQuestionPage = () => {
   const [playerCount, setPlayerCount] = useState(0);
   const connectionRef = useRef(null);
 
+  const host = import.meta.env.VITE_API_BE_URL || 'http://localhost:5173/'; // Default port if not set in .env
+
   localStorage.setItem('QuestionInGame', QuestionInGameID);
   // Fetch question and reset timer
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
         const inGameRes = await axios.get(
-          `https://localhost:7153/api/questions-in-game/${QuestionInGameID}`
+          `${host}/api/questions-in-game/${QuestionInGameID}`
         );
         const questionId = inGameRes.data?.data?.questionId;
         localStorage.setItem('OrderIndex', inGameRes.data?.data?.OrderIndex);
@@ -32,7 +34,7 @@ const HostQuestionPage = () => {
           return;
         }
         const questionRes = await axios.get(
-          `https://localhost:7153/api/questions/${questionId}`
+          `${host}/api/questions/${questionId}`
         );
         const data = questionRes.data.data;
         setQuestionData(data);
@@ -53,7 +55,7 @@ const HostQuestionPage = () => {
     const fetchResponseCount = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7153/api/questions/questions-in-game/${QuestionInGameID}/responses`
+          `${host}/api/questions/questions-in-game/${QuestionInGameID}/responses`
         );
         if (response.data && response.data.data) {
           const count = response.data.data.length; // Count responses
@@ -79,7 +81,7 @@ const HostQuestionPage = () => {
     const fetchPlayersCount = async () => {
         try {
             const response = await axios.get(
-                `https://localhost:7153/api/sessions/${sessionId}/players`
+                `${host}/api/sessions/${sessionId}/players`
             );
             const players = response.data?.data || [];
             setPlayerCount(players.length);
@@ -98,7 +100,7 @@ const HostQuestionPage = () => {
   useEffect(() => {
     const connection = new HubConnectionBuilder()
       .withUrl(
-        `https://localhost:7153/gameSessionHub`,
+        `${host}/gameSessionHub`,
         {
           skipNegotiation: true,
           transport: HttpTransportType.WebSockets,

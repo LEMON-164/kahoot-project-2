@@ -23,19 +23,21 @@ const Leaderboard = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState('');
 
+  const host = import.meta.env.VITE_API_BE_URL || 'http://localhost:5173/'; // Default port if not set in .env
+
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
         // First, get session info to determine game mode
         const sessionRes = await axios.get(
-          `https://localhost:7153/api/gamesession/GetById/${sessionId}`
+          `${host}/api/gamesession/GetById/${sessionId}`
         );
         const mode = sessionRes.data.data.gameMode?.toLowerCase(); // adjust property name if different
 
         if (mode === 'team') {
           // Team mode: fetch team rankings
           const teamRes = await axios.get(
-            `https://localhost:7153/api/team-results/ranking/session/${sessionId}`
+            `${host}/api/team-results/ranking/session/${sessionId}`
           );
           const teamData = teamRes.data.data || [];
           // Map team results into common shape
@@ -48,7 +50,7 @@ const Leaderboard = () => {
         } else {
           // Solo mode (default): fetch individual leaderboard
           const soloRes = await axios.get(
-            `https://localhost:7153/api/gamesession/GetLeaderboard/${sessionId}`
+            `${host}/api/gamesession/GetLeaderboard/${sessionId}`
           );
           setPlayers(soloRes.data.data || []);
         }
@@ -58,7 +60,7 @@ const Leaderboard = () => {
       }
     };
     const conn = new HubConnectionBuilder()
-      .withUrl(`https://localhost:7153/gameSessionHub`, {
+      .withUrl(`${host}/gameSessionHub`, {
         transport: HttpTransportType.WebSockets,
         skipNegotiation: true,
       })
@@ -113,7 +115,7 @@ const Leaderboard = () => {
       console.log('[handleNextClick] Gọi NextQuestion:', sessionId, qigId);
       await hubConnection.invoke('NextQuestion', parseInt(sessionId, 10), qigId);
 
-      const res = await axios.get(`https://localhost:7153/api/game-sessions/${sessionId}/questions-in-game`);
+      const res = await axios.get(`${host}/api/game-sessions/${sessionId}/questions-in-game`);
       console.log('[handleNextClick] API response:', res.data);
   
       const questions = Array.isArray(res.data.data) ? res.data.data : [];

@@ -10,6 +10,8 @@ const GameSessionModal = ({ visible, onClose, quizId }) => {
   const [generatedPin, setGeneratedPin] = useState('');
   const navigate = useNavigate();
 
+  const host = import.meta.env.VITE_API_BE_URL || 'http://localhost:5173/'; // Default port if not set in .env
+
   // hàm sinh PIN 6 chữ số
   const generatePin = () =>
     Math.floor(100000 + Math.random() * 900000).toString();
@@ -46,7 +48,7 @@ const GameSessionModal = ({ visible, onClose, quizId }) => {
       };
 
       await axios.post(
-        'https://localhost:7153/api/gamesession/Create',
+        '${host}/api/gamesession/Create',
         payload
       );
 

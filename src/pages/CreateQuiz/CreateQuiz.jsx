@@ -47,7 +47,7 @@ const CreateQuiz = () => {
   const [questions, setQuestions] = useState([]);
   const [selectedQuestion, setSelectedQuestion] = useState(0);
   const [answers, setAnswers] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState(null);
+  const [correctAnswer, setCorrectAnswer] = useState([]);
   const [timeLimit, setTimeLimit] = useState(20);
 
   const handleAnswerChange = (index, value) => {
@@ -104,7 +104,7 @@ const CreateQuiz = () => {
       QuizId: quizId,
       Text: question.text,
       TimeLimit: timeLimit,
-      ImageFile: null,
+      ImageFile: question.imageFile || null,
       ImageData: null,
       Option1: answers[0],
       Option2: answers[1],
@@ -157,9 +157,8 @@ const CreateQuiz = () => {
           {questions.map((q, index) => (
             <div
               key={q.questionId}
-              className={`question-thumb ${
-                selectedQuestion === q.questionId ? 'selected' : ''
-              }`}
+              className={`question-thumb ${selectedQuestion === q.questionId ? 'selected' : ''
+                }`}
               onClick={() => {
                 setSelectedQuestion(q.questionId);
                 setAnswers([q.option1, q.option2, q.option3, q.option4]);
@@ -212,12 +211,36 @@ const CreateQuiz = () => {
             }}
           />
         )}
-        {/* 
+        <div className="w-10 h-10 overflow-hidden rounded-full item-center justify-center">
+          <img
+            width={300}
+            height={300}
+            src={
+              getQuestion()?.imageFile
+                ? URL.createObjectURL(getQuestion().imageFile)
+                : getQuestion()?.imageUrl
+            }
+            alt="Ảnh câu hỏi"
+            style={{ border: '50%', objectFit: 'cover' }}
+          />
+        </div>
+
         <div className="media-upload-box">
-          <Upload>
+          <Upload
+            accept="image/*"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              setQuestions((prev) =>
+                prev.map((q) =>
+                  q.questionId === selectedQuestion ? { ...q, imageFile: file } : q
+                )
+              );
+              return false; // Ngăn auto-upload
+            }}
+          >
             <Button icon={<UploadOutlined />}>Tải tệp tin lên</Button>
           </Upload>
-        </div> */}
+        </div>
 
         <Row gutter={[16, 16]}>
           {[0, 1, 2, 3].map((i) => {
@@ -229,9 +252,8 @@ const CreateQuiz = () => {
             return (
               <Col span={12} key={i}>
                 <Card
-                  className={`${styleClass} ${
-                    correctAnswer === i ? 'selected' : ''
-                  }`}
+                  className={`${styleClass} ${correctAnswer === i ? 'selected' : ''
+                    }`}
                   onClick={() => {
                     if (isFilled) {
                       setQuestions(
@@ -267,9 +289,8 @@ const CreateQuiz = () => {
                   </div>
                   <Input
                     className="answer-input"
-                    placeholder={`Thêm đáp án ${i + 1} ${
-                      i >= 2 ? '(không bắt buộc)' : ''
-                    }`}
+                    placeholder={`Thêm đáp án ${i + 1} ${i >= 2 ? '(không bắt buộc)' : ''
+                      }`}
                     value={answers[i]}
                     onChange={(e) => handleAnswerChange(i, e.target.value)}
                   />

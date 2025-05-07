@@ -3,6 +3,7 @@ import apiClient from './apiClient';
 export const createUser = async (userData) => {
   try {
     const response = await apiClient.post('/api/users', userData);
+    console.log('Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating user:', error);
@@ -17,6 +18,7 @@ export const updateUser = async (userId, updatedData) => {
       `/api/users/${userId}`,
       updatedData
     );
+    console.log('Response:', response.data);
     return response.data;
   } catch (error) {
     console.error(`Error updating user with ID ${userId}:`, error);
@@ -28,6 +30,7 @@ export const updateUser = async (userId, updatedData) => {
 export const loginUser = async (loginData) => {
   try {
     const response = await apiClient.post('/api/users/login', loginData);
+    console.log('Response:', response.data);
     return response.data; // Quan trọng: return đúng .data
   } catch (error) {
     console.error('Login failed:', error);
@@ -38,6 +41,7 @@ export const loginUser = async (loginData) => {
 export const getQuizByUserId = async (userId) => {
   try {
     const response = await apiClient.get(`/api/users/${userId}/quizzes`);
+    console.log('Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error getting all quizzes:', error);

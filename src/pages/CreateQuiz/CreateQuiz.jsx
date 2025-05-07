@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import {
   Layout,
   Input,
@@ -40,6 +40,10 @@ const answerStyles = [
   { color: 'green', icon: '■' },
 ];
 
+function capitalizeFirstLetter(val) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
 const CreateQuiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,7 +51,7 @@ const CreateQuiz = () => {
   const [questions, setQuestions] = useState([]);
   const [selectedQuestion, setSelectedQuestion] = useState(0);
   const [answers, setAnswers] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState([]);
+  const [correctAnswer, setCorrectAnswer] = useState("");
   const [timeLimit, setTimeLimit] = useState(20);
 
   const handleAnswerChange = (index, value) => {
@@ -68,15 +72,15 @@ const CreateQuiz = () => {
         Option2: '',
         Option3: '',
         Option4: '',
-        CorrectOption: 1,
+        CorrectOptions: '',
         OrderIndex: questions.length,
         CreatedTime: new Date().toISOString(),
-        Status: 'active',
+        Status: 'Active',
       });
       setQuestions([...questions, response.data]);
       setSelectedQuestion(questions.length);
       setAnswers(['', '', '', '']);
-      setCorrectAnswer(null);
+      setCorrectAnswer('');
     } catch (error) {
       console.error('Error creating quiz question:', error);
     }
@@ -97,8 +101,8 @@ const CreateQuiz = () => {
   };
 
   const handleSaveQuestion = async () => {
+
     const question = getQuestion();
-    console.log(quizId);
     const updatedData = {
       QuestionId: question.QuestionId,
       QuizId: quizId,
@@ -111,15 +115,14 @@ const CreateQuiz = () => {
       Option3: answers[2],
       Option4: answers[3],
       OrderIndex: question.orderIndex,
-      CorrectOption: correctAnswer,
-      Status: question.status,
+      CorrectOptions: correctAnswer,
+      Status: capitalizeFirstLetter(question.status),
     };
     try {
       const response = await updateQuizQuestion(
         question.questionId,
         updatedData
       );
-      console.log(response);
     } catch (error) {
       console.error('Error updating quiz question:', error);
     }
@@ -127,13 +130,11 @@ const CreateQuiz = () => {
 
   const getQuestion = () => {
     const question = questions.find((q) => q.questionId === selectedQuestion);
-    console.log(question);
     return question;
   };
 
   useEffect(() => {
     const fetchQuizQuestion = async () => {
-      console.log(quizId);
       const response = await getQuizQuestions(quizId);
       setQuestions(response.data);
       setSelectedQuestion(response.data[0].questionId);
@@ -143,11 +144,20 @@ const CreateQuiz = () => {
         response.data[0].option3,
         response.data[0].option4,
       ]);
-      setCorrectAnswer(response.data[0].correctOption);
+      setCorrectAnswer(response.data[0].correctOptions);
       setTimeLimit(response.data[0].timeLimit);
     };
     fetchQuizQuestion();
   }, [quizId]);
+
+  useEffect(() => {
+    console.log('Correct Answer:', correctAnswer);
+  }, [correctAnswer]);
+
+  useEffect(() => {
+    console.log('Questions:', questions);
+  }, [questions]);
+
 
   return (
     <Layout className="createquiz-container">
@@ -162,7 +172,7 @@ const CreateQuiz = () => {
               onClick={() => {
                 setSelectedQuestion(q.questionId);
                 setAnswers([q.option1, q.option2, q.option3, q.option4]);
-                setCorrectAnswer(q.correctOption);
+                setCorrectAnswer(q.correctOptions);
                 setTimeLimit(q.timeLimit);
               }}
             >
@@ -212,7 +222,7 @@ const CreateQuiz = () => {
           />
         )}
         <div className="w-10 h-10 overflow-hidden rounded-full item-center justify-center">
-          <img
+          {(getQuestion()?.imageFile || getQuestion()?.imageUrl) && <img
             width={300}
             height={300}
             src={
@@ -220,9 +230,8 @@ const CreateQuiz = () => {
                 ? URL.createObjectURL(getQuestion().imageFile)
                 : getQuestion()?.imageUrl
             }
-            alt="Ảnh câu hỏi"
             style={{ border: '50%', objectFit: 'cover' }}
-          />
+          />}
         </div>
 
         <div className="media-upload-box">
@@ -252,19 +261,24 @@ const CreateQuiz = () => {
             return (
               <Col span={12} key={i}>
                 <Card
-                  className={`${styleClass} ${correctAnswer === i ? 'selected' : ''
+                  className={`${styleClass} ${correctAnswer?.split(',')?.includes((i+1).toString())
+                    ? 'selected' : ''
                     }`}
                   onClick={() => {
                     if (isFilled) {
                       setQuestions(
                         questions.map((q) => {
                           if (q.questionId === selectedQuestion) {
-                            return { ...q, correctOption: i };
+                            const correctAns = correctAnswer?.split(',')?.includes((i+1).toString())
+                              ? correctAnswer.replace(`,${(i+1)}`, '').replace((i+1), '')
+                              : correctAnswer?.length > 0 ? 
+                              correctAnswer + ',' + (i+1) : (i+1).toString();
+                            setCorrectAnswer(correctAns);
+                            return { ...q, correctOptions: correctAns };
                           }
                           return q;
                         })
                       );
-                      setCorrectAnswer(i);
                     }
                   }}
                 >
@@ -272,12 +286,17 @@ const CreateQuiz = () => {
                     <span className="answer-icon">{answerStyles[i].icon}</span>
                     {isFilled && (
                       <Checkbox
-                        checked={correctAnswer === i}
+                        checked={correctAnswer?.split(',')?.includes((i+1).toString())}
                         onChange={() => {
                           setQuestions(
                             questions.map((q) => {
                               if (q.questionId === selectedQuestion) {
-                                return { ...q, correctOption: i };
+                                const correctAns = correctAnswer?.split(',')?.includes((i+1).toString())
+                                  ? correctAnswer.replace(`,${(i+1)}`, '').replace((i+1), '')
+                                  : correctAnswer?.length > 0 ? 
+                                  correctAnswer + ',' + (i+1) : (i+1).toString();
+                                setCorrectAnswer(correctAns);
+                                return { ...q, correctOptions: correctAns };
                               }
                               return q;
                             })
@@ -312,7 +331,7 @@ const CreateQuiz = () => {
             onChange={(value) => setTimeLimit(value)}
           />
         </div>
-
+        
         <div className="setting-actions">
           <Button
             icon={<ArrowLeftOutlined />}

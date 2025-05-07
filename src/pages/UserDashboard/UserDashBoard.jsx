@@ -83,6 +83,25 @@ const UserDashBoard = () => {
     }
   };
 
+  const handleToggleStatus = (record, status) => async () => {
+    const newStatus = status === 'Active' ? 'Inactive' : 'Active';
+    const updatedQuiz = { ...record, status: newStatus };
+    const newData = data.map((item) =>
+      item.quizId === record.quizId ? updatedQuiz : item
+    );
+    try {
+      const response = await updateQuiz(record.quizId, updatedQuiz);
+      if (response.statusCode === 200) {
+        setData(newData);
+        setEditingKey('');
+      } else {
+        console.error('Error updating quiz status:', response.message);
+      }
+    } catch (error) {
+      console.error('Error updating quiz status:', error);
+    }
+  };
+
   const cancel = () => setEditingKey('');
 
   const handleChange = (e, field) => {
@@ -166,8 +185,16 @@ const UserDashBoard = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (status) => (
-        <Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag>
+      render: (status, record) => (
+        currentUser.role === 'Admin' ? 
+        (
+          <Button style={{ backgroundColor: status === 'Active' ? 'red' : 'green', color: 'white' }}
+            onClick={handleToggleStatus(record, status)}
+          >
+            {status === 'Active' ? 'Deactivate' : 'Activate'}
+          </Button>
+        )
+        : (<Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag>)
       ),
     },
     {

@@ -20,6 +20,7 @@ import {
   CloseOutlined,
   ArrowLeftOutlined,
   SaveOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 import './CreateQuiz.css';
 import {
@@ -53,6 +54,8 @@ const CreateQuiz = () => {
   const [answers, setAnswers] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [timeLimit, setTimeLimit] = useState(20);
+  const [saveStatus, setSaveStatus] = useState('');
+
 
   const handleAnswerChange = (index, value) => {
     const newAnswers = [...answers];
@@ -118,11 +121,20 @@ const CreateQuiz = () => {
       CorrectOptions: correctAnswer,
       Status: capitalizeFirstLetter(question.status),
     };
+    // try {
+    //   const response = await updateQuizQuestion(
+    //     question.questionId,
+    //     updatedData
+    //   );
+    // } catch (error) {
+    //   console.error('Error updating quiz question:', error);
+    // }
     try {
-      const response = await updateQuizQuestion(
-        question.questionId,
-        updatedData
-      );
+      setSaveStatus('saving');
+      await updateQuizQuestion(question.questionId, updatedData); // chú ý: QuestionId viết hoa
+      setSaveStatus('saved');
+
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       console.error('Error updating quiz question:', error);
     }
@@ -261,7 +273,7 @@ const CreateQuiz = () => {
             return (
               <Col span={12} key={i}>
                 <Card
-                  className={`${styleClass} ${correctAnswer?.split(',')?.includes((i+1).toString())
+                  className={`${styleClass} ${correctAnswer?.split(',')?.includes((i + 1).toString())
                     ? 'selected' : ''
                     }`}
                   onClick={() => {
@@ -269,10 +281,10 @@ const CreateQuiz = () => {
                       setQuestions(
                         questions.map((q) => {
                           if (q.questionId === selectedQuestion) {
-                            const correctAns = correctAnswer?.split(',')?.includes((i+1).toString())
-                              ? correctAnswer.replace(`,${(i+1)}`, '').replace((i+1), '')
-                              : correctAnswer?.length > 0 ? 
-                              correctAnswer + ',' + (i+1) : (i+1).toString();
+                            const correctAns = correctAnswer?.split(',')?.includes((i + 1).toString())
+                              ? correctAnswer.replace(`,${(i + 1)}`, '').replace((i + 1), '')
+                              : correctAnswer?.length > 0 ?
+                                correctAnswer + ',' + (i + 1) : (i + 1).toString();
                             setCorrectAnswer(correctAns);
                             return { ...q, correctOptions: correctAns };
                           }
@@ -286,15 +298,15 @@ const CreateQuiz = () => {
                     <span className="answer-icon">{answerStyles[i].icon}</span>
                     {isFilled && (
                       <Checkbox
-                        checked={correctAnswer?.split(',')?.includes((i+1).toString())}
+                        checked={correctAnswer?.split(',')?.includes((i + 1).toString())}
                         onChange={() => {
                           setQuestions(
                             questions.map((q) => {
                               if (q.questionId === selectedQuestion) {
-                                const correctAns = correctAnswer?.split(',')?.includes((i+1).toString())
-                                  ? correctAnswer.replace(`,${(i+1)}`, '').replace((i+1), '')
-                                  : correctAnswer?.length > 0 ? 
-                                  correctAnswer + ',' + (i+1) : (i+1).toString();
+                                const correctAns = correctAnswer?.split(',')?.includes((i + 1).toString())
+                                  ? correctAnswer.replace(`,${(i + 1)}`, '').replace((i + 1), '')
+                                  : correctAnswer?.length > 0 ?
+                                    correctAnswer + ',' + (i + 1) : (i + 1).toString();
                                 setCorrectAnswer(correctAns);
                                 return { ...q, correctOptions: correctAns };
                               }
@@ -331,7 +343,7 @@ const CreateQuiz = () => {
             onChange={(value) => setTimeLimit(value)}
           />
         </div>
-        
+
         <div className="setting-actions">
           <Button
             icon={<ArrowLeftOutlined />}
@@ -339,8 +351,15 @@ const CreateQuiz = () => {
           >
             Quay lại
           </Button>
-          <Button icon={<SaveOutlined />} onClick={handleSaveQuestion}>
+          {/* <Button icon={<SaveOutlined />} onClick={handleSaveQuestion}>
             Lưu
+          </Button> */}
+          <Button
+            icon={saveStatus === 'saved' ? <CheckOutlined /> : <SaveOutlined />}
+            onClick={handleSaveQuestion}
+            loading={saveStatus === 'saving'}
+          >
+            {saveStatus === 'saved' ? 'Đã lưu' : 'Lưu'}
           </Button>
         </div>
       </Sider>

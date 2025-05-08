@@ -39,7 +39,7 @@ const Summary = () => {
             <Row gutter={16} className="summary-info">
                 <Col span={6}>
                     <div className="summary-card highlight">
-                        <h1>{summary?.averageScore?.toFixed(2) ?? '0.00'}%</h1>
+                        <h1>{summary?.averageScore}</h1>
                         <p>Điểm trung bình</p>
                     </div>
                 </Col>

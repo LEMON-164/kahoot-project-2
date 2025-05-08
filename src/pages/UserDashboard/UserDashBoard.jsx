@@ -11,6 +11,7 @@ import {
   Row,
   Col,
   Dropdown,
+  notification
 } from 'antd';
 import {
   UserOutlined,
@@ -33,7 +34,7 @@ import {
   deleteQuiz,
   getAllSessions,
 } from '../../services/QuizServices';
-import GameSessionModal from './HostModal'; 
+import GameSessionModal from './HostModal';
 // import { getQuizByUserId } from '../../services/UserServices';
 const { Sider, Content } = Layout;
 
@@ -117,7 +118,7 @@ const UserDashBoard = () => {
     };
     try {
       const response = await createQuiz(newQuiz);
-      setData((prevData) => [...prevData, response.data]);
+      setData((prevData) => [response.data, ...prevData]);
       setEditingKey(response.data.quizId);
       setEditedUser(response.data);
       console.log('Response:', response);
@@ -186,15 +187,15 @@ const UserDashBoard = () => {
       title: 'Status',
       dataIndex: 'status',
       render: (status, record) => (
-        currentUser.role === 'Admin' ? 
-        (
-          <Button style={{ backgroundColor: status === 'Active' ? 'red' : 'green', color: 'white' }}
-            onClick={handleToggleStatus(record, status)}
-          >
-            {status === 'Active' ? 'Deactivate' : 'Activate'}
-          </Button>
-        )
-        : (<Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag>)
+        currentUser.role === 'Admin' ?
+          (
+            <Button style={{ backgroundColor: status === 'Active' ? 'red' : 'green', color: 'white' }}
+              onClick={handleToggleStatus(record, status)}
+            >
+              {status === 'Active' ? 'Deactivate' : 'Activate'}
+            </Button>
+          )
+          : (<Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag>)
       ),
     },
     {
@@ -234,7 +235,7 @@ const UserDashBoard = () => {
             Delete
           </Button>
         ) : (
-              <Button onClick={() => handleHost(record.quizId)}>Host</Button>
+          <Button onClick={() => handleHost(record.quizId)}>Host</Button>
         ),
     },
   ];
@@ -270,17 +271,6 @@ const UserDashBoard = () => {
         >
           QUIZZZZZZ
         </div>
-        {/* <Menu mode="inline" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1" icon={<UserOutlined />}>
-            Cá nhân
-          </Menu.Item>
-          <Menu.Item key="2" icon={<AppstoreOutlined />}>
-            Thư viện
-          </Menu.Item>
-          <Menu.Item key="3" icon={<LineChartOutlined />}>
-            Báo cáo
-          </Menu.Item>
-        </Menu> */}
         <Menu
           mode="inline"
           selectedKeys={[selectedMenuKey]}
@@ -300,29 +290,6 @@ const UserDashBoard = () => {
       </Sider>
       <Layout>
         <Header />
-        {/* <Content style={{ margin: '16px' }}>
-          <Row
-            justify="space-between"
-            align="middle"
-            style={{ marginBottom: 16 }}
-          >
-            <Col>
-              <h2 style={{ margin: 0 }}>Your Quizzzes</h2>
-            </Col>
-            {currentUser.role === 'Admin' && (
-              <Col>
-                <Button
-                  type="primary"
-                  icon={<EditOutlined />}
-                  onClick={() => handleCreateQuiz()}
-                >
-                  Create
-                </Button>
-              </Col>
-            )}
-          </Row>
-          <Table columns={columns} dataSource={data} pagination={false} />
-        </Content> */}
         <Content style={{ margin: '16px' }}>
           {selectedMenuKey === '1' && (
             <>
